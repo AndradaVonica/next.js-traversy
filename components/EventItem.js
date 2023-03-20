@@ -5,12 +5,13 @@ import styles from "@/styles/EventItem.module.css"
 
 export default function EventItem({ evt }) {
     console.log('HERE ETVTTTTTT', evt)
+    console.log('plm', evt.attributes.slug)
 
     return (
         <div className={ styles.event }>
             <div className={ styles.img } >
                 <Image
-                    loader={ () => evt.attributes.image.data.attributes.formats.thumbnail.url }
+                    loader={ () => evt.attributes?.image?.data?.attributes.formats.thumbnail.url }
                     src={ evt.attributes?.image?.data?.attributes?.formats?.thumbnail?.url || '/images/event-default.png' }
                     width={ 170 }
                     height={ 100 } />
