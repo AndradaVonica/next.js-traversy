@@ -1,6 +1,7 @@
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Layout from "@/components/Layout"
+import Modal from "@/components/Modal"
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from "next/link"
@@ -9,6 +10,7 @@ import { API_URL } from "@/config/index"
 import styles from "@/styles/Form.module.css"
 import slugify from "slugify"
 import moment from "moment"
+import { FaImage } from 'react-icons/fa'
 
 
 export default function EditEventPage({ evt }) {
@@ -24,6 +26,8 @@ export default function EditEventPage({ evt }) {
         description
     })
     const [imagePreview, setImagePreview] = useState(evt.data?.attributes?.image?.data?.attributes.formats.thumbnail.url)
+
+    const [showModal, setShowModal] = useState(false)
 
     // console.log("idkkkk", evt.data.attributes.name);
     const router = useRouter()
@@ -155,9 +159,18 @@ export default function EditEventPage({ evt }) {
             <h2> Event image</h2>
             {imagePreview ? (
                 <Image loader={ () => imagePreview } src={ imagePreview } height={ 100 } width={ 170 } />
-            ) : <div>
+            ) : (<div>
                 <p>No image uploaded</p>
-            </div> }
+            </div>
+            ) }
+            <div>
+                <button onClick={ () => setShowModal(true) } className='btn-secondary' >
+                    <FaImage /> Set image
+                </button>
+            </div>
+            <Modal show={ showModal } onClose={ () => setShowModal(false) }>
+                IMAGE UPL
+            </Modal>
         </Layout>
     )
 }
