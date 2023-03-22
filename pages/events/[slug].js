@@ -5,18 +5,36 @@ import styles from "@/styles/Event.module.css"
 import Link from "next/link"
 import Image from "next/image"
 import { FaPencilAlt, FaTimes } from "react-icons/fa"
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useRouter } from "next/router"
+
 
 
 export default function EventPage(params) {
+    const router = useRouter()
     const { evt } = params
-    console.log('here is EVT thingy', evt)
-    console.log('params', params)
+    // console.log('here is EVT thingy', evt)
+    // console.log('params', params)
     // const myEvent = evt.find(eventData => eventData.attributes.slug === eventData.id)
     // const myEvent = evt.find(({ id }) => id === evt.attributes.slug)
     // console.log("aici vine", myEvent);
+    console.log('rrrr', evt.attributes.image);
 
-    const deleteEvent = (e) => {
-        // console.log('delete');
+    const deleteEvent = async (e) => {
+        if (confirm('Are you sure?')) {
+            const res = await fetch(`${ API_URL }/api/events?populate=*/${ evt.id }`, {
+                method: 'DELETE'
+            })
+
+            const data = await res.json()
+
+            if (!res.ok) {
+                toast.error(data.message)
+            } else {
+                router.push('/events')
+            }
+        }
     }
     return (
         <Layout>
@@ -35,10 +53,11 @@ export default function EventPage(params) {
                     { new Date(evt.attributes.date).toLocaleString('en-US') } at { evt.attributes.time }
                 </span>
                 <h1>{ evt.attributes.name }</h1>
+                <ToastContainer />
                 { evt.attributes.image && (
                     <div className={ styles.image }>
                         <Image
-                            loader={ () => evt.attributes.image?.data?.attributes?.formats.medium.url }
+                            loader={ () => evt.attributes.image?.data?.attributes?.formats.medium.url || '/images/event-default.png' }
                             src={ evt.attributes?.image?.data?.attributes?.formats?.medium?.url || '/images/event-default.png' }
                             width={ 960 } height={ 600 } />
                     </div>
@@ -66,7 +85,9 @@ export async function getStaticPaths() {
     const events = await res.json()
     console.log('smothhh', events.data[0])
     const paths = events.data.map(evt => ({
-        params: { slug: evt.attributes.slug }
+        params: {
+            slug: evt.attributes.slug
+        }
 
     }))
 

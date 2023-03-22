@@ -4,21 +4,28 @@ import Layout from "@/components/Layout"
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from "next/link"
+import Image from "next/image"
 import { API_URL } from "@/config/index"
 import styles from "@/styles/Form.module.css"
 import slugify from "slugify"
+import moment from "moment"
 
 
-export default function AddEventPage() {
+export default function EditEventPage({ evt }) {
+    console.log("bla", evt.attributes);
+    const { name, performers, venue, address, date, time, description } = evt.data.attributes
     const [values, setValues] = useState({
-        name: " ",
-        performers: " ",
-        venue: " ",
-        address: " ",
-        date: " ",
-        time: " ",
-        description: " "
+        name,
+        performers,
+        venue,
+        address,
+        date,
+        time,
+        description
     })
+    const [imagePreview, setImagePreview] = useState(evt.data?.attributes?.image?.data?.attributes.formats.thumbnail.url)
+
+    // console.log("idkkkk", evt.data.attributes.name);
     const router = useRouter()
     const handelSubmit = async (e) => {
         e.preventDefault()
@@ -31,8 +38,8 @@ export default function AddEventPage() {
             toast.error('Please fill all fields');
         }
 
-        const res = await fetch(`${ API_URL }/api/events`, {
-            method: 'POST',
+        const res = await fetch(`${ API_URL }/api/events/${ evt.data.id }`, {
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -55,10 +62,9 @@ export default function AddEventPage() {
             return;
         }
 
-        const evt = await res.json()
-        toast.error(JSON.stringify(evt))
-        console.log('eventu nostru', evt)
-        router.push(`/api/events/${ evt?.data?.attributes?.slug }`)
+        const updateEvt = await res.json()
+        // console.log('eventu nostru', evt)
+        router.push(`/api/events/${ updateEvt?.data?.attributes?.slug }`)
     }
     const handleInputChange = (e) => {
         const { name, value } = e.target
@@ -68,7 +74,7 @@ export default function AddEventPage() {
     return (
         <Layout title="Add new event">
             <Link href='/events' legacyBehavior> Go Back</Link>
-            <h1>Add Events</h1>
+            <h1>Edit Events</h1>
             <ToastContainer />
             <form onSubmit={ handelSubmit }
                 className={ styles.form } >
@@ -119,7 +125,7 @@ export default function AddEventPage() {
                             type='date'
                             name='date'
                             id='date'
-                            value={ values.date }
+                            value={ moment(values.date).format('yyyy-MM-DD') }
                             onChange={ handleInputChange }
                         />
                     </div>
@@ -144,8 +150,28 @@ export default function AddEventPage() {
                         onChange={ handleInputChange }
                     ></textarea>
                 </div>
-                <input type='submit' value='Add event' className='btn' />
+                <input type='submit' value='Update event' className='btn' />
             </form>
+            <h2> Event image</h2>
+            {imagePreview ? (
+                <Image loader={ () => imagePreview } src={ imagePreview } height={ 100 } width={ 170 } />
+            ) : <div>
+                <p>No image uploaded</p>
+            </div> }
         </Layout>
     )
+}
+
+export async function getServerSideProps({ params: { id } }) {
+    const res = await fetch(`${ API_URL }/api/events/${ id }?populate=*`)
+    const evt = await res.json()
+    console.log("ce id", evt.data.attributes.image.data.attributes.formats.thumbnail.url);
+
+
+    return {
+        props: {
+            evt
+        }
+    }
+
 }
