@@ -2,6 +2,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Layout from "@/components/Layout"
 import Modal from "@/components/Modal"
+import ImageUpload from "@/components/ImageUpload"
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from "next/link"
@@ -14,8 +15,9 @@ import { FaImage } from 'react-icons/fa'
 
 
 export default function EditEventPage({ evt }) {
-    console.log("bla", evt.attributes);
+    // console.log("bla", evt.data.attributes);
     const { name, performers, venue, address, date, time, description } = evt.data.attributes
+    const { id } = evt.data
     const [values, setValues] = useState({
         name,
         performers,
@@ -74,6 +76,15 @@ export default function EditEventPage({ evt }) {
         const { name, value } = e.target
         setValues({ ...values, [name]: value })
     }
+
+    const imageUploaded = async (e) => {
+        const res = await fetch(`${ API_URL }/events/${ evt.id }`)
+        const data = await res.json()
+        setImagePreview(data?.attributes.formats.thumbnail.url)
+        setShowModal(false)
+    }
+
+
 
     return (
         <Layout title="Add new event">
@@ -169,16 +180,17 @@ export default function EditEventPage({ evt }) {
                 </button>
             </div>
             <Modal show={ showModal } onClose={ () => setShowModal(false) }>
-                IMAGE UPL
+                <ImageUpload evtId={ id } imageUploaded={ imageUploaded } />
             </Modal>
         </Layout>
     )
 }
 
-export async function getServerSideProps({ params: { id } }) {
+export async function getServerSideProps({ params: { id }, req }) {
     const res = await fetch(`${ API_URL }/api/events/${ id }?populate=*`)
     const evt = await res.json()
-    console.log("ce id", evt.data.attributes.image.data.attributes.formats.thumbnail.url);
+    console.log('cookie req', req.headers.cookie);
+    console.log("ce id", evt.data?.attributes?.image?.data?.attributes.formats.thumbnail.url);
 
 
     return {

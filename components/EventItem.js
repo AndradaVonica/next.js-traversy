@@ -4,7 +4,7 @@ import styles from "@/styles/EventItem.module.css"
 
 
 export default function EventItem({ evt }) {
-    console.log('HERE ETVTTTTTT', evt)
+    // console.log('HERE ETVTTTTTT', evt)
     // console.log('plm', evt.attributes.slug)
 
     return (

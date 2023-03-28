@@ -14,8 +14,8 @@ import { useRouter } from "next/router"
 export default function EventPage(params) {
     const router = useRouter()
     const { evt } = params
-    // console.log('here is EVT thingy', evt)
-    // console.log('params', params)
+    // console.log('here is EVT thingy', params)
+    console.log('params', params)
     // const myEvent = evt.find(eventData => eventData.attributes.slug === eventData.id)
     // const myEvent = evt.find(({ id }) => id === evt.attributes.slug)
     // console.log("aici vine", myEvent);
