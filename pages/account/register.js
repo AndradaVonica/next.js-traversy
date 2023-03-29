@@ -86,7 +86,7 @@ export default function registerPage() {
                             onChange={ (e) => setPasswordConfirm(e.target.value) } >
                         </input>
                     </div>
-                    <input type='submit' value='Login' className='btn' />
+                    <input type='submit' value='Register' className='btn' />
                 </form>
                 <p> Already have an account?
                     <Link href="/account/login" legacyBehavior>
